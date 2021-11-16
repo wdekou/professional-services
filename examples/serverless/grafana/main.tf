@@ -1,5 +1,5 @@
 locals {
-  apis = ["iam.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "apigateway.googleapis.com", "servicemanagement.googleapis.com", "servicecontrol.googleapis.com", "compute.googleapis.com", "iap.googleapis.com"]
+  apis = ["iam.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "apigateway.googleapis.com", "servicemanagement.googleapis.com", "servicecontrol.googleapis.com", "compute.googleapis.com", "iap.googleapis.com", "sql-component.googleapis.com", "cloudapis.googleapis.com", "containerregistry.googleapis.com", "sqladmin.googleapis.com"]
 }
 
 data "google_project" "project" {
@@ -59,7 +59,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name = "GF_DATABASE_NAME"
-          value = "grafana"
+          value = "grafana2"
         }
         env {
           name = "GF_DATABASE_PASSWORD"
@@ -123,7 +123,7 @@ resource "google_cloud_run_service" "default" {
       annotations ={
         "autoscaling.knative.dev/maxScale"         = "100" 
         "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.instance.connection_name
-        "run.googleapis.com/client-name"        = "grafana"
+        "run.googleapis.com/client-name"        = "grafana2"
       }
     }
   }
@@ -143,7 +143,7 @@ resource "google_cloud_run_service" "default" {
 }
 
 resource "google_sql_database_instance" "instance" {
-  name   = "grafana-mysql"
+  name   = "grafana-mysql2"
   database_version = "MYSQL_8_0"
   region = var.region
   project = var.project_id
@@ -156,7 +156,7 @@ resource "google_sql_database_instance" "instance" {
 }
 
 resource "google_sql_database" "database" {
-  name     = "grafana"
+  name     = "grafana2"
   project = var.project_id
   instance = google_sql_database_instance.instance.name
 }
