@@ -59,7 +59,7 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name = "GF_DATABASE_NAME"
-          value = "grafana2"
+          value = "grafana"
         }
         env {
           name = "GF_DATABASE_PASSWORD"
@@ -123,7 +123,7 @@ resource "google_cloud_run_service" "default" {
       annotations ={
         "autoscaling.knative.dev/maxScale"         = "100" 
         "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.instance.connection_name
-        "run.googleapis.com/client-name"        = "grafana2"
+        "run.googleapis.com/client-name"        = "grafana"
       }
     }
   }
@@ -143,7 +143,7 @@ resource "google_cloud_run_service" "default" {
 }
 
 resource "google_sql_database_instance" "instance" {
-  name   = "grafana-mysql2"
+  name   = "grafana-mysql"
   database_version = "MYSQL_8_0"
   region = var.region
   project = var.project_id
@@ -156,7 +156,7 @@ resource "google_sql_database_instance" "instance" {
 }
 
 resource "google_sql_database" "database" {
-  name     = "grafana2"
+  name     = "grafana"
   project = var.project_id
   instance = google_sql_database_instance.instance.name
 }
