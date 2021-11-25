@@ -2,7 +2,7 @@ resource "google_compute_region_network_endpoint_group" "cloud_run_neg" {
   name                  = "cloud-run-neg"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
-  project = var.project_id
+  project = data.google_project.project.project_id
   cloud_run {
     service = google_cloud_run_service.default.name
   }
@@ -12,7 +12,7 @@ module "lb-http" {
   source  = "GoogleCloudPlatform/lb-http/google//modules/serverless_negs"
   version = "~> 5.1"
   name    = "tf-cr-lb"
-  project = var.project_id
+  project = data.google_project.project.project_id
 
   ssl                             = true
   managed_ssl_certificate_domains = [ var.domain ]
@@ -51,7 +51,7 @@ module "lb-http" {
 resource "google_compute_security_policy" "api-policy" {
   provider = google-beta
   name = "api-policy"
-  project = var.project_id
+  project = data.google_project.project.project_id
   
   adaptive_protection_config {
     layer_7_ddos_defense_config {
@@ -59,17 +59,6 @@ resource "google_compute_security_policy" "api-policy" {
     }
   }
 }
-/*
-resource "google_iap_brand" "project_brand" {
-  support_email     = var.support_email
-  application_title = "Grafana"
-  project           = var.project_id
-    
-  depends_on = [
-    google_project_service.project
-  ]
-}*/
-
 resource "google_iap_client" "project_client" {
   display_name = "LB Client"
   brand        =  "projects/${data.google_project.project.number}/brands/${data.google_project.project.number}" 
