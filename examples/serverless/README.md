@@ -1,27 +1,11 @@
 # Serverless Grafana with Identity Aware Proxy
 
-## Setup a service account to use with Terraform
-1. Create a new Service Account
-    - Go to IAM -> Service Accounts -> Create new Service Account
-    - Grant access to roles
-        - Storage Admin
-        - Artifact Registry Administrator
-        - Cloud SQL Admin
-        - Service Management Administrator
-2. Go to your newly created service account and click on “KEYS”. Create a new key and download it.
-
-## Authenticate with your service account
-3. Authenticate with your service account by running `gcloud auth activate-service-account [USERNAME]@[PROJECT-ID].iam.gserviceaccount.com --key-file=[PATH-TO-YOUR-KEYFILE]`
-4. Run `gcloud auth configure-docker [GCP_REGION].pkg.dev`
-
 ## Setup Terraform
 5. Run `terraform init`
 6. Set required terraform variables, e.g. Linux:
 
     `export TF_VAR_project_id=[YOUR_GCP_PROJECT_ID]` You can find the project ID in the GCP console
-
-    `export TF_VAR_support_email=[YOUR_SUPPORT_EMAIL]`
-    
+    `export TF_VAR_support_email=[YOUR_SUPPORT_EMAIL]` 
     `export TF_VAR_domain=[YOUR_DOMAIN]` This is the domain to host your Grafana dashboard
 
 ## Execute the Terraform script to create your Grafana Dashboard
