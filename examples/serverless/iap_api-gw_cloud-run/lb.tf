@@ -75,6 +75,10 @@ resource "google_compute_security_policy" "api-policy" {
       enable = true
     }
   }
+
+  depends_on = [
+    google_project_service.project
+  ]
 }
 resource "google_iap_client" "project_client" {
   display_name = "LB Client"
