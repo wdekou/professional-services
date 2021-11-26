@@ -25,7 +25,7 @@ resource "google_secret_manager_secret_iam_member" "secret-access" {
   project = data.google_project.project.project_id
   secret_id = google_secret_manager_secret.secret.id
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
   depends_on = [google_secret_manager_secret.secret]
 }
 

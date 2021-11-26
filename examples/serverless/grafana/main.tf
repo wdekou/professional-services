@@ -35,6 +35,11 @@ EOT
   ]
 }
 
+data "google_compute_default_service_account" "default" {
+  project = data.google_project.project.project_id
+}
+
+
 resource "google_project_service" "project" {
   for_each = toset(local.apis)
   project = data.google_project.project.project_id
@@ -58,6 +63,7 @@ resource "google_cloud_run_service" "default" {
   
   template {
     spec {
+      service_account_name = data.google_compute_default_service_account.default.email
       containers {
         image ="${var.region}-docker.pkg.dev/${data.google_project.project.project_id}/grafana/grafana:${var.grafana_version}"
         ports {
@@ -85,7 +91,7 @@ resource "google_cloud_run_service" "default" {
           value_from {
             secret_key_ref {
               name = google_secret_manager_secret.secret.secret_id
-              key = "1"
+              key = "latest"
             }
           }
         }
@@ -151,7 +157,21 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name = "GF_USERS_EDITORS_CAN_ADMIN"
-          value = "true" // default false
+          value = "false"
+        }
+        volume_mounts {
+          name = "datasource-volume"
+          mount_path = "/etc/grafana/provisioning/datasource"
+        }
+      }
+      volumes {
+        name = "datasource-volume"
+        secret {
+          secret_name = google_secret_manager_secret.datasource.secret_id
+          items {
+            key = "latest"
+            path = "datasource.yml"
+          }
         }
       }
     }
@@ -173,7 +193,33 @@ resource "google_cloud_run_service" "default" {
     google_project_service.project,
     null_resource.docker_image,
     google_sql_database.database,
-    google_sql_user.user
+    google_sql_user.user,
+    google_secret_manager_secret_iam_member.datasource-access,
+    google_secret_manager_secret_iam_member.secret-access
   ]
+}
 
+resource "google_secret_manager_secret" "datasource" {
+  project = data.google_project.project.project_id
+  secret_id = "datasource-yml"
+  replication {
+    automatic = true
+  }
+
+  depends_on = [
+    google_project_service.project
+  ]
+}
+
+resource "google_secret_manager_secret_version" "datasource-version-data" {
+  secret = google_secret_manager_secret.datasource.name
+  secret_data = file("${path.module}/provisioning/datasources/datasource.yml")
+}
+
+resource "google_secret_manager_secret_iam_member" "datasource-access" {
+  project = data.google_project.project.project_id
+  secret_id = google_secret_manager_secret.datasource.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
+  depends_on = [google_secret_manager_secret.secret]
 }
