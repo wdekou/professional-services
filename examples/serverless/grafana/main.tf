@@ -1,44 +1,10 @@
 locals {
-  apis = ["iam.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "apigateway.googleapis.com", "servicemanagement.googleapis.com", "servicecontrol.googleapis.com", "compute.googleapis.com", "iap.googleapis.com", "sql-component.googleapis.com", "cloudapis.googleapis.com", "containerregistry.googleapis.com", "sqladmin.googleapis.com", "secretmanager.googleapis.com", "artifactregistry.googleapis.com"]
+  apis = ["iam.googleapis.com", "compute.googleapis.com", "run.googleapis.com", "apigateway.googleapis.com", "servicemanagement.googleapis.com", "servicecontrol.googleapis.com", "iap.googleapis.com", "sql-component.googleapis.com", "cloudapis.googleapis.com", "sqladmin.googleapis.com", "secretmanager.googleapis.com"]
 }
 
 data "google_project" "project" {
   project_id = var.project_id
 }
-
-resource "google_artifact_registry_repository" "grafana" {
-  provider = google-beta
-
-  location = var.region
-  project = data.google_project.project.project_id
-  repository_id = "grafana"
-  description = "Docker repository for Grafana"
-  format = "DOCKER"
-
-  depends_on = [
-    google_project_service.project
-  ]
-}
-
-resource "null_resource" docker_image {
-
-  provisioner "local-exec" {
-    command = <<EOT
-docker pull grafana/grafana:${var.grafana_version}
-docker tag grafana/grafana:${var.grafana_version} ${var.region}-docker.pkg.dev/${var.project_id}/grafana/grafana:${var.grafana_version}
-docker push ${var.region}-docker.pkg.dev/${var.project_id}/grafana/grafana:${var.grafana_version}
-EOT
-  }
-
-  depends_on = [
-    google_artifact_registry_repository.grafana
-  ]
-}
-
-data "google_compute_default_service_account" "default" {
-  project = data.google_project.project.project_id
-}
-
 
 resource "google_project_service" "project" {
   for_each = toset(local.apis)
@@ -65,7 +31,7 @@ resource "google_cloud_run_service" "default" {
     spec {
       service_account_name = data.google_compute_default_service_account.default.email
       containers {
-        image ="${var.region}-docker.pkg.dev/${data.google_project.project.project_id}/grafana/grafana:${var.grafana_version}"
+        image ="mirror.gcr.io/grafana/grafana:latest"
         ports {
           name = "http1"
           container_port = 8080
@@ -191,7 +157,6 @@ resource "google_cloud_run_service" "default" {
 
   depends_on = [
     google_project_service.project,
-    null_resource.docker_image,
     google_sql_database.database,
     google_sql_user.user,
     google_secret_manager_secret_iam_member.datasource-access,
