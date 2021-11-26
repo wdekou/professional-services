@@ -15,6 +15,10 @@ resource "google_project_service" "project" {
   disable_on_destroy = false
 }
 
+data "google_compute_default_service_account" "default" {
+  project = data.google_project.project.project_id
+}
+
 resource "google_cloud_run_service" "default" {
   provider = google-beta
   name     = "grafana"
