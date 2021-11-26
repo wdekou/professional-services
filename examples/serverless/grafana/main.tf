@@ -29,6 +29,10 @@ docker tag grafana/grafana:${var.grafana_version} ${var.region}-docker.pkg.dev/$
 docker push ${var.region}-docker.pkg.dev/${var.project_id}/grafana/grafana:${var.grafana_version}
 EOT
   }
+
+  depends_on = [
+    google_artifact_registry_repository.grafana
+  ]
 }
 
 resource "google_project_service" "project" {
