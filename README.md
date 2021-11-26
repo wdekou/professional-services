@@ -9,6 +9,7 @@ The examples folder contains example solutions across a variety of Google Cloud 
 * [Anthos Service Mesh Multi-Cluster](examples/anthos-service-mesh-multicluster) - Solution to federate two private GKE clusters using Anthos Service Mesh.
 * [Anthos CICD with Gitlab](examples/anthos-cicd-with-gitlab) - A step-by-step guide to create an example CI/CD solution using Anthos and Gitlab.
 * [Audio Content Profiling](examples/ml-audio-content-profiling) - A tool that builds a pipeline to scale the process of moderating audio files for inappropriate content using machine learning APIs.
+* [Cloud Audit Log Samples](examples/audit-log-examples/) - A sample collection of Audit Logs for Users and Customers to better the structure, contents, and values contained in various log events.
 * [BigQuery Audit Log Dashboard](examples/bigquery-audit-log) - Solution to help audit BigQuery usage using Data Studio for visualization and a sample SQL script to query the back-end data source consisting of audit logs.
 * [BigQuery Audit Log Anomaly Detection](examples/bigquery-auditlog-anomaly-detection) - Sample of using BigQuery audit logs for automated anomaly detection and outlier analysis. Generates user friendly graphs for quick bq environment analysis.
 * [BigQuery Automated Email Exports](examples/bq-email-exports) - Serverless solution to automate the sending of BigQuery export results via email on a scheduled interval. The email will contain a link to a signed or unsigned URL, allowing the recipient to view query results as a JSON, CSV, or Avro file.
@@ -46,8 +47,10 @@ The examples folder contains example solutions across a variety of Google Cloud 
 * [Dataflow DLP Hashpipeline](examples/dataflow-dlp-hash-pipeline) - Match DLP Social Security Number findings against a hashed dictionary in Firestore. Use Secret Manager for the hash key.
 * [Dataflow Template Pipelines](https://github.com/GoogleCloudPlatform/DataflowTemplates) - Pre-implemented Dataflow template pipelines for solving common data tasks on Google Cloud Platform.
 * [Dataflow Production Ready](examples/dataflow-production-ready) - Reference implementation for best practices around Beam, pipeline structuring, testing and continuous deployment.
+* [Dataflow XML to BigQuery](examples/dataflow-xmlio-to-bq) - Example of loading XML data into BigQuery with DataFlow via XMLIO.
 * [Dataproc GCS Connector](examples/dataproc-gcs-connector) - Install and test unreleased features on the GCS Connector for Dataproc.
 * [Dataproc Persistent History Server for Ephemeral Clusters](examples/dataproc-persistent-history-server) - Example of writing logs from an ephemeral cluster to GCS and using a separate single node cluster to look at Spark and YARN History UIs.
+* [dbt-on-cloud-composer](examples/dbt-on-cloud-composer) - Example of using dbt to manage BigQuery data pipelines, utilizing Cloud Composer to run and schedule the dbt runs.
 * [Dialogflow Webhook Example](examples/dialogflow-webhook-example) - Webhook example for dialogflow in Python.
 * [Dialogflow Entities Creation and Update](examples/dialogflow-entities-example) - Creation and update of entities for Dialogflow in Python.
 * [DLP API Examples](examples/dlp) - Examples of the DLP API usage.
