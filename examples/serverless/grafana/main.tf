@@ -36,7 +36,7 @@ resource "google_cloud_run_service" "default" {
       service_account_name = data.google_compute_default_service_account.default.email
       container_concurrency = 20
       containers {
-        image ="mirror.gcr.io/grafana/grafana:latest"
+        image ="mirror.gcr.io/grafana/grafana:${var.grafana_version}"
         ports {
           name = "http1"
           container_port = 8080
