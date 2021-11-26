@@ -30,11 +30,16 @@ resource "google_cloud_run_service" "default" {
   template {
     spec {
       service_account_name = data.google_compute_default_service_account.default.email
+      container_concurrency = 20
       containers {
         image ="mirror.gcr.io/grafana/grafana:latest"
         ports {
           name = "http1"
           container_port = 8080
+        }
+        env {
+          name = "GF_LOG_LEVEL"
+          value = "DEBUG"
         }
         env {
           name = "GF_SERVER_HTTP_PORT"
@@ -127,7 +132,15 @@ resource "google_cloud_run_service" "default" {
         }
         volume_mounts {
           name = "datasource-volume"
-          mount_path = "/etc/grafana/provisioning/datasource"
+          mount_path = "/etc/grafana/provisioning/datasources"
+        }
+        volume_mounts {
+          name = "dashboard-yaml-volume"
+          mount_path = "/etc/grafana/provisioning/dashboards"
+        }
+        volume_mounts {
+          name = "dashboard-json-volume"
+          mount_path = "/var/lib/grafana/dashboards/gcp"
         }
       }
       volumes {
@@ -136,7 +149,27 @@ resource "google_cloud_run_service" "default" {
           secret_name = google_secret_manager_secret.datasource.secret_id
           items {
             key = "latest"
-            path = "datasource.yml"
+            path = "cloud-monitoring.yaml"
+          }
+        }
+      }
+      volumes {
+        name = "dashboard-yaml-volume"
+        secret {
+          secret_name = google_secret_manager_secret.dashboard-yaml.secret_id
+          items {
+            key = "latest"
+            path = "gclb.yaml"
+          }
+        }
+      }
+      volumes {
+        name = "dashboard-json-volume"
+        secret {
+          secret_name = google_secret_manager_secret.dashboard-json.secret_id
+          items {
+            key = "latest"
+            path = "gclb.json"
           }
         }
       }
@@ -160,7 +193,9 @@ resource "google_cloud_run_service" "default" {
     google_sql_database.database,
     google_sql_user.user,
     google_secret_manager_secret_iam_member.datasource-access,
-    google_secret_manager_secret_iam_member.secret-access
+    google_secret_manager_secret_iam_member.secret-access,
+    google_secret_manager_secret_iam_member.dashboard-yaml-access,
+    google_secret_manager_secret_iam_member.dashboard-json-access,
   ]
 }
 
@@ -178,7 +213,7 @@ resource "google_secret_manager_secret" "datasource" {
 
 resource "google_secret_manager_secret_version" "datasource-version-data" {
   secret = google_secret_manager_secret.datasource.name
-  secret_data = file("${path.module}/provisioning/datasources/datasource.yml")
+  secret_data = file("${path.module}/provisioning/datasources/cloud-monitoring.yaml")
 }
 
 resource "google_secret_manager_secret_iam_member" "datasource-access" {
@@ -186,5 +221,57 @@ resource "google_secret_manager_secret_iam_member" "datasource-access" {
   secret_id = google_secret_manager_secret.datasource.id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
-  depends_on = [google_secret_manager_secret.secret]
+  depends_on = [google_secret_manager_secret.datasource, google_secret_manager_secret_version.datasource-version-data]
+}
+
+
+resource "google_secret_manager_secret" "dashboard-yaml" {
+  project = data.google_project.project.project_id
+  secret_id = "dashboard-yaml"
+  replication {
+    automatic = true
+  }
+
+  depends_on = [
+    google_project_service.project
+  ]
+}
+
+resource "google_secret_manager_secret_version" "dashboard-yaml-version-data" {
+  secret = google_secret_manager_secret.dashboard-yaml.name
+  secret_data = file("${path.module}/provisioning/dashboards/gclb.yaml")
+}
+
+resource "google_secret_manager_secret_iam_member" "dashboard-yaml-access" {
+  project = data.google_project.project.project_id
+  secret_id = google_secret_manager_secret.dashboard-yaml.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
+  depends_on = [google_secret_manager_secret.dashboard-yaml, google_secret_manager_secret_version.dashboard-yaml-version-data]
+}
+
+
+resource "google_secret_manager_secret" "dashboard-json" {
+  project = data.google_project.project.project_id
+  secret_id = "dashboard-json"
+  replication {
+    automatic = true
+  }
+
+  depends_on = [
+    google_project_service.project
+  ]
+}
+
+resource "google_secret_manager_secret_version" "dashboard-json-version-data" {
+  secret = google_secret_manager_secret.dashboard-json.name
+  secret_data = file("${path.module}/provisioning/dashboards/gclb.json")
+}
+
+resource "google_secret_manager_secret_iam_member" "dashboard-json-access" {
+  project = data.google_project.project.project_id
+  secret_id = google_secret_manager_secret.dashboard-json.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${data.google_compute_default_service_account.default.email}"
+  depends_on = [google_secret_manager_secret.dashboard-json, google_secret_manager_secret_version.dashboard-json-version-data]
 }
