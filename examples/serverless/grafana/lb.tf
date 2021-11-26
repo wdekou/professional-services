@@ -59,6 +59,7 @@ resource "google_compute_security_policy" "api-policy" {
     }
   }
 }
+
 resource "google_iap_client" "project_client" {
   display_name = "LB Client"
   brand        =  "projects/${data.google_project.project.number}/brands/${data.google_project.project.number}" 

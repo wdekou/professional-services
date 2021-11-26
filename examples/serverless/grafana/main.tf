@@ -10,8 +10,6 @@ resource "google_project_service" "project" {
   for_each = toset(local.apis)
   project = data.google_project.project.project_id
   service = each.key
-
-  //disable_dependent_services = true
   disable_on_destroy = false
 }
 
@@ -124,11 +122,11 @@ resource "google_cloud_run_service" "default" {
         }
         env {
           name = "GF_USERS_AUTO_ASSIGN_ORG_ROLE"
-          value = "Admin" //Viewer,Editor,Admin
+          value = "Viewer"
         }
         env {
           name = "GF_USERS_VIEWERS_CAN_EDIT"
-          value = "true" // default false
+          value = "true" 
         }
         env {
           name = "GF_USERS_EDITORS_CAN_ADMIN"
