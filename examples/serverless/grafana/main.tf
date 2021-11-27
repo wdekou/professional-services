@@ -32,7 +32,6 @@ resource "google_cloud_run_service" "default" {
   template {
     spec {
       service_account_name = data.google_compute_default_service_account.default.email
-      container_concurrency = 20
       containers {
         image ="mirror.gcr.io/grafana/grafana:${var.grafana_version}"
         ports {
@@ -107,6 +106,10 @@ resource "google_cloud_run_service" "default" {
         env {
           name = "GF_AUTH_PROXY_ENABLED"
           value = "true"
+        }
+        env {
+          name = "GF_SERVER_ROOT_URL"
+          value = "https://${var.domain}"
         }
         env {
           name = "GF_AUTH_PROXY_HEADER_NAME"
