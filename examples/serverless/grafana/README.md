@@ -4,8 +4,6 @@ This Terraform script deploys a basic setup for running Grafana serverless on Cl
 
 You should have basic knowledge of Google Cloud Platform, Grafana and Terraform, own a domain, and can modify its A record.
 
-![Serverless Grafana architecture](https://storage.googleapis.com/gcp-community/tutorials/serverless-grafana-with-iap/grafana-iap-architecture.png)
-
 
 ### Before you begin
 
@@ -21,9 +19,7 @@ You should have a Google Cloud Platform account and project setup, billing confi
 Configure an OAuth consent screen for Identity-Aware Proxy. 
   1. Go to GCP Console > Security > Identity-Aware Proxy. 
   2. If you didn’t configure a consent screen before, there will be a red warning message prompting you to configure one. 
-  ![Consent missing error message](https://storage.googleapis.com/gcp-community/tutorials/serverless-grafana-with-iap/iap-consent-not-confgured.png)
-  1. Click Configure Consent Screen, choose User Type Internal and click Create. Internal allows only users that are part of your organization to access your application. You can add additional users by logging into admin.google.com.
-  ![Configure consent](https://storage.googleapis.com/gcp-community/tutorials/serverless-grafana-with-iap/iap-configure-oauth.png)
+  3. Click Configure Consent Screen, choose User Type Internal and click Create. Internal allows only users that are part of your organization to access your application. You can add additional users by logging into admin.google.com.
   4. Enter the app name and user support email, then click Save and continue until the process is complete.
 
 
