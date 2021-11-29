@@ -9,5 +9,5 @@ variable "domain" {
 }
 
 variable "grafana_version" {
-  default = "8.2.1"
+  default = "latest"
 }
